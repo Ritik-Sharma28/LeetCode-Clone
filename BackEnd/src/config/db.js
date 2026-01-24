@@ -1,7 +1,7 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
-async function main (){
+async function main() {
    await mongoose.connect(process.env.DB_CONNECT_KEY)
 }
 
-module.exports = main;
+export default main;

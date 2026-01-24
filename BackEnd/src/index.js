@@ -1,30 +1,33 @@
-const express = require("express");
-// require('dotenv').config({ path: '../.env' });
-import dotenv from 'dotenv';
-import authRouter from "./routes/userAuth";
+import express from "express";
+ import dotenv from 'dotenv';
+import { authRouter } from "./routes/userAuth.js";
+import cookieParser from "cookie-parser";
 dotenv.config();
-const main = require("./config/db")
+//dotenv.config({ path: "../.env" });
+import main from "./config/db.js"
+import { redisClient } from "./config/redis.js";
 
 const app = express();
 
 app.use(express.json())
+app.use(cookieParser())
 
 
 
-app.use("/auth" , authRouter)
+app.use("/auth", authRouter)
 
 
 
 
 
-const  serverConnect  = async () => {
+const serverConnect = async () => {
   try {
-       await main()
-       console.log("Connected to db successfully.")
+    await Promise.all([main(), redisClient.connect()])
+    console.log("Connected to db successfully.")
 
-       app.listen(process.env.PORT , ()=> {
-        console.log(`Listening at Port ${process.env.PORT}...`)
-       })
+    app.listen(process.env.PORT, () => {
+      console.log(`Listening at Port ${process.env.PORT}...`)
+    })
   } catch (err) {
     console.log(err)
   }
@@ -32,14 +35,3 @@ const  serverConnect  = async () => {
 
 serverConnect()
 
-// main()
-//   .then(() => {
-//     console.log("DB CONNECTED");
-
-//     app.listen(process.env.PORT, () => {
-//       console.log(`Listening at Port ${process.env.PORT}...`);
-//     });
-//   })
-//   .catch((err) => {
-//     console.error("Error connecting to DB:", err);
-//   });
