@@ -1,13 +1,14 @@
 import express from "express";
- import dotenv from 'dotenv';
+import 'dotenv/config';
 import { authRouter } from "./routes/userAuth.js";
 import cookieParser from "cookie-parser";
-dotenv.config();
-//dotenv.config({ path: "../.env" });
+//dotenv.config();
+
 import main from "./config/db.js"
 import { redisClient } from "./config/redis.js";
 
 const app = express();
+
 
 app.use(express.json())
 app.use(cookieParser())
