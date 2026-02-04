@@ -5,8 +5,6 @@ export const createProblem = async (req, res) => {
         if (req.result.role !== "admin")
             throw new Error("Invalid Credentials")
 
-        // console.log(req.body)
-
         const { title, description, difficulty, tags, visibleTestCases
             , hiddenTestCases, startCode, referenceSolution, problemCreator } = req.body
 
@@ -23,12 +21,7 @@ export const createProblem = async (req, res) => {
                 ],
                 stdin: visibleTestCases[0].input,
             }
-          //  console.log(payload)
             const response = await compileCode(payload)
-
-
-
-           // console.log(response)
 
             if (response.run.signal != null || response.run.code != 0 || response.run.stdout == ""
                 || response.run.stderr != "") {
@@ -53,3 +46,95 @@ export const createProblem = async (req, res) => {
         res.status(500).send("Error Occured in Creating Problem = " + error)
     }
 }
+
+export const updateProblem = async (req, res) => {
+   try { 
+      if( req.result.role !== 'admin')
+        throw new Error("Invalid Credentials")
+
+    const {id} = req.params;
+        if(!id){
+        return res.status(400).send("Missing ID Field");
+        }
+
+      const { title, description, difficulty, tags, visibleTestCases
+            , hiddenTestCases, startCode, referenceSolution, problemCreator } = req.body 
+
+       const problem = await Problem.findById(id);
+
+       if(!problem)
+        return res.status(404).send("ID is not persent in server");
+       
+       const update = await Problem.findByIdAndUpdate(id , {...req.body}, {runValidators:true, new:true})
+       
+       res.send("Updated Successfully")
+
+
+   } catch (err){
+      res.send("Error in Updating Problem " + err);
+   }
+}
+
+export const deleteProblem = async (req , res) => {
+    try {
+        if( req.result.role !== 'admin')
+        throw new Error("Invalid Credentials")
+
+        const {id} = req.params;
+
+        const deleted = await Problem.findByIdAndDelete(id);
+
+        if(!deleted)
+            res.send("Deletion Failed")
+
+        res.send("Deleted Successfully")
+
+
+    } catch (err){
+        res.send("Error during Deletion " + err)
+    }
+}
+
+export const getProblemById = async (req, res) => {
+    try {
+        const {id} = req.params;
+        if(!id){
+        return res.status(400).send("Missing ID Field");
+        }
+
+        const problem = await findById(id);
+
+        if(!problem)
+            res.send("Problem Not Found")
+
+        res.send(problem)
+
+    } catch (err) {
+            res.send("Error in fetching Problem " + err)
+    }
+}
+
+export const getAllProblem = async (req,res) => {
+        try {
+
+        const problems = await find({s});
+
+        if(problem.length == 0)
+            res.send("Problems are missing")
+
+        res.send(problems)
+
+    } catch (err) {
+            res.send("Error in fetching Problems " + err)
+    }
+}
+
+// export const solvedAllProblemByUser = async (req,res) => {
+//     try {
+
+
+//     } catch (err) {
+
+//     }
+// }
+
