@@ -1,6 +1,7 @@
 import express from "express";
 import 'dotenv/config';
 import { authRouter  } from "./routes/userAuth.js";
+import submitRouter from "./routes/submit.js";
 import  problemRouter  from "./routes/problemCreator.js";
 import cookieParser from "cookie-parser";
 //dotenv.config();
@@ -18,6 +19,7 @@ app.use(cookieParser())
 
 app.use("/auth", authRouter)
 app.use("/problem", problemRouter)
+app.use('/submission',submitRouter);
 
 
 

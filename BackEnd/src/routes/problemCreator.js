@@ -1,6 +1,6 @@
 import express from "express";
 import { userMiddleware } from "../middleware/userMiddleware.js";
-import { createProblem , updateProblem , deleteProblem , getProblemById , getAllProblem , solvedAllProblemByUser , submittedProblem} from "../controllers/userProblem.js";
+import { createProblem , updateProblem , deleteProblem , getProblemById , getAllProblem , solvedAllProblembyUser , submittedProblem} from "../controllers/userProblem.js";
 const problemRouter = express.Router()
 
 
@@ -10,9 +10,9 @@ problemRouter.delete("/delete/:id" ,userMiddleware, deleteProblem)
 
 problemRouter.get("/problemById/:id" ,userMiddleware, getProblemById)
 problemRouter.get("/getAllProblem" ,userMiddleware, getAllProblem)
-// problemRouter.get("/problemSolvedByUser" ,userMiddleware, solvedAllProblembyUser)
-// problemRouter.get("/submittedProblem/:pid" ,userMiddleware, submittedProblem)
+problemRouter.get("/problemSolvedByUser" ,userMiddleware, solvedAllProblembyUser)
+problemRouter.get("/submittedProblem/:pid" ,userMiddleware, submittedProblem)
 
 
-export default problemRouter
+export default problemRouter;
 
