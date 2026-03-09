@@ -95,6 +95,8 @@ const problemSchema = new Schema({
         ref: 'user',
         required: true
     }
+}, {
+    timestamps: true
 })
 
 const Problem = mongoose.model("problem", problemSchema)

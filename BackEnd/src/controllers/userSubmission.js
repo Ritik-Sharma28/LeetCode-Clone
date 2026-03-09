@@ -1,7 +1,7 @@
 import Problem from "../models/problem.js";
-import { runJudge } from "../judge/submission.js";
+import { runJudge } from "../judge1/submission.js";
 import { Submission } from "../models/submission.js";
-import { runTest } from "../judge/run.js";
+import { runTest } from "../judge1/run.js";
 
 export const submitCode = async (req, res) => {
     try {
@@ -35,7 +35,7 @@ export const submitCode = async (req, res) => {
             language,
             status: result.verdict,
             testCasesTotal: allTestCases.length,
-            errorMessage: result.rawResponse.run.stderr,
+            errorMessage: result.rawResponse?.error || null,
             testCasePassed: result.details.testCasesPassed
 
         })
@@ -49,12 +49,12 @@ export const submitCode = async (req, res) => {
 
 export const runCode = async (req, res) => {
     try {
-        const {  code, language, input } = req.body;
+        const { code, language, input } = req.body;
 
         if (!code || !language || !input) {
             return res.status(400).send("Missing required fields: code, language, input");
         }
-         const problemId = req.params.id
+        const problemId = req.params.id
         let problem = null;
         if (problemId) {
             problem = await Problem.findById(problemId);

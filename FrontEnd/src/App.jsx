@@ -1,33 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { checkAuth } from './services/authSlice';
+import { Navigate, Route, Routes } from 'react-router';
+import Homepage from './pages/Homepage';
+import ProblemPage from './pages/ProblemPage';
+import AdminPage from './pages/AdminPage';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const dispatch = useDispatch();
+
+  const { user, isAuthenticated, loading } = useSelector((state) => state.auth)
+
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [])
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <span className="loading loading-spinner loading-lg"></span>
+    </div>
+  )
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+
+      <Routes>
+
+        <Route path="/" element={isAuthenticated ? <Homepage /> : <Navigate to="/login" />}></Route>
+        <Route path="/problem/:problemId" element={isAuthenticated ? <ProblemPage /> : <Navigate to="/login" />}></Route>
+        <Route path="/admin" element={isAuthenticated ? <AdminPage /> : <Navigate to="/login" />}></Route>
+        <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <Login />}></Route>
+        <Route path="/signup" element={isAuthenticated ? <Navigate to="/" /> : <Signup />}></Route>
+
+      </Routes>
+
     </>
   )
 }

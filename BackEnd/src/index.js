@@ -4,12 +4,17 @@ import { authRouter  } from "./routes/userAuth.js";
 import submitRouter from "./routes/submit.js";
 import  problemRouter  from "./routes/problemCreator.js";
 import cookieParser from "cookie-parser";
+import cors from "cors"
 //dotenv.config();
 
 import main from "./config/db.js"
 import { redisClient } from "./config/redis.js";
 
 const app = express();
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true 
+}))
 
 
 app.use(express.json())
@@ -19,7 +24,7 @@ app.use(cookieParser())
 
 app.use("/auth", authRouter)
 app.use("/problem", problemRouter)
-app.use('/submission',submitRouter);
+app.use("/submission",submitRouter);
 
 
 

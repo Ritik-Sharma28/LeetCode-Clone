@@ -1,6 +1,7 @@
-import { runJudge } from "../judge/submission.js";
+import { runJudge } from "../judge1/submission.js";
 import Problem from "../models/problem.js";
 import User from "../models/user.js";
+import { Submission } from "../models/submission.js";
 
 export const createProblem = async (req, res) => {
     try {
@@ -9,7 +10,7 @@ export const createProblem = async (req, res) => {
 
         const { title, description, difficulty, tags, visibleTestCases
             , hiddenTestCases, startCode, referenceSolution, problemCreator
-            , problemSignature } = req.body 
+            , problemSignature } = req.body
 
         if (!problemSignature) {
             return res.status(400).send("Problem Signature is required");
@@ -21,7 +22,7 @@ export const createProblem = async (req, res) => {
 
             const result = await runJudge({
                 language,
-                code: completeCode, 
+                code: completeCode,
                 testCases: allTestCases,
                 problemSignature: problemSignature
             });
@@ -104,10 +105,19 @@ export const getProblemById = async (req, res) => {
             return res.status(400).send("Missing ID Field");
         }
 
-        const problem = await findById(id).select('_id title description difficulty tags visibleTestCases startCode referenceSolution ');;
+        let problem;
+        if (req.result.role === 'admin') {
+            // Admin gets ALL fields + creator info
+            problem = await Problem.findById(id)
+                .populate('problemCreator', 'firstName emailId');
+        } else {
+            // Regular user gets limited fields
+            problem = await Problem.findById(id)
+                .select('_id title description difficulty tags visibleTestCases startCode referenceSolution problemSignature');
+        }
 
         if (!problem)
-            res.send("Problem Not Found")
+            return res.status(404).send("Problem Not Found")
 
         res.send(problem)
 
@@ -118,11 +128,19 @@ export const getProblemById = async (req, res) => {
 
 export const getAllProblem = async (req, res) => {
     try {
-
-        const problems = await find({}).select('_id title difficulty tags');
+        let problems;
+        if (req.result.role === 'admin') {
+            // Admin gets creator info + timestamps
+            problems = await Problem.find({})
+                .select('_id title difficulty tags problemCreator createdAt updatedAt')
+                .populate('problemCreator', 'firstName emailId');
+        } else {
+            // Regular user gets limited fields
+            problems = await Problem.find({}).select('_id title difficulty tags');
+        }
 
         if (problems.length == 0)
-            res.send("Problems are missing")
+            return res.send("Problems are missing")
 
         res.send(problems)
 

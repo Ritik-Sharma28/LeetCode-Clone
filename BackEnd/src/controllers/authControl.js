@@ -31,13 +31,15 @@ export const register = async (req, res) => {
             message: "Loggin Successfully"
         })
     } catch (err) {
-        res.status(400).send("Error: " + err);
+        res.status(400).json( {
+            error : err
+    });
     }
 }
 
 export const login = async (req, res) => {
     try {
-        validate(req.body)
+       // validate(req.body)
 
         const { emailId, password } = req.body;
 
@@ -56,7 +58,7 @@ export const login = async (req, res) => {
             role: user.role,
         }
 
-        const token = jwt.sign({ _id: user._id, emailId: emailId, role: user.role }, process.env.JWT_KEY, { expiresIn: 60 * 60 });
+        const token = jwt.sign({ _id: user._id, emailId: emailId, role: user.role }, process.env.JWT_SECRET, { expiresIn: 60 * 60 });
         res.cookie('token', token, { maxAge: 60 * 60 * 1000 });
         res.status(201).json({
             user: reply,
